@@ -66,9 +66,13 @@ publishing {
         create<MavenPublication>("maven") {
             from(components["java"])
             
+            groupId = "ru.iuturakulov"
+            artifactId = "tartib-dsl"
+            version = "0.1.0"
+            
             pom {
-                name.set("tartib-dsl")
-                description.set("A DSL library for rules management")
+                name.set("Tartib DSL")
+                description.set("A powerful Kotlin library for defining and managing business rules and validations")
                 url.set("https://github.com/IslombekTurakulov/tartib-dsl")
                 
                 licenses {
