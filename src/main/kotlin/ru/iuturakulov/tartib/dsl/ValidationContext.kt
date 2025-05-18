@@ -89,7 +89,7 @@ fun <T> T.validateWithContext(
     cache: ValidationCache? = null,
     init: ValidationRule<T>.() -> Unit
 ): List<ValidationResult> {
-    val rule = ValidationRule<T>().apply(init)
+    val rule = ValidationRule<T>(validate = { true }, message = "Context validation").apply(init)
     return rule.validate(this, context, cache)
 }
 

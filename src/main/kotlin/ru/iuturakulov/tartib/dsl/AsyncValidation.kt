@@ -67,4 +67,19 @@ suspend fun <T> T.isValidAsync(
     init: AsyncValidationRule<T>.() -> Unit
 ): Boolean {
     return validateAsync(coroutineContext, init).all { it is ValidationResult.Success }
+}
+
+fun <T> async(
+    validationContext: ValidationContext,
+    init: suspend ValidationScope<T>.() -> Unit
+): ValidationRule<T> {
+    return ValidationRule(
+        validate = { value ->
+            runBlocking {
+                val scope = ValidationScope<T>().apply { init() }
+                scope.build().evaluate(value).all { it.isSuccess }
+            }
+        },
+        message = "Async validation failed"
+    )
 } 

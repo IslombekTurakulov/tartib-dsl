@@ -90,7 +90,7 @@ fun <T, N> ValidationScope<T>.nested(value: N?, init: ValidationScope<N>.() -> U
 }
 
 @ValidationDsl
-fun <T> ValidationScope<T>.whenever(condition: (T) -> Boolean, init: ValidationScope<T>.() -> Unit) {
+fun <T> ValidationScope<T>.validateWhen(condition: (T) -> Boolean, init: ValidationScope<T>.() -> Unit) {
     rule<T> {
         name("Conditional validation")
         condition { context ->
@@ -105,7 +105,7 @@ fun <T> ValidationScope<T>.whenever(condition: (T) -> Boolean, init: ValidationS
 }
 
 @ValidationDsl
-fun <T> ValidationScope<T>.optional(init: ValidationScope<T>.() -> Unit) {
+fun <T> ValidationScope<T>.validateOptional(init: ValidationScope<T>.() -> Unit) {
     rule<T> {
         name("Optional validation")
         condition { context ->

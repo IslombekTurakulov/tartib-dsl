@@ -305,5 +305,6 @@ fun <T, C : Collection<T>> ValidationRule<C>.grouped(
 
 // Вспомогательная функция для внутренней валидации
 private fun <T> T.isValidInternal(validator: ValidationRule<T>.() -> Unit): Boolean {
-    return ValidationRule<T>().apply(validator).validate(this).all { it is ValidationResult.Success }
+    val rule = ValidationRule<T>(validate = { true }, message = "Internal validation").apply(validator)
+    return rule.validate(this).all { it is ValidationResult.Success }
 } 

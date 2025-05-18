@@ -12,18 +12,39 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Получаем полную историю для правильного определения версии
       
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'gradle'  # Встроенное кэширование Gradle
+          
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
           
       - name: Build with Gradle
         run: ./gradlew build
+        timeout-minutes: 10
+        continue-on-error: false
+        
+      - name: Run tests with coverage
+        run: ./gradlew test jacocoTestReport
+        timeout-minutes: 5
+        
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: build/reports/jacoco/test/html/
+          if-no-files-found: error
         
       - name: Publish to GitHub Packages
+        if: success()
         run: ./gradlew publish
+        timeout-minutes: 5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }} 

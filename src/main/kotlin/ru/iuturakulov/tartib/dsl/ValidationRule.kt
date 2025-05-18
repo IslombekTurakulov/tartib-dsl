@@ -3,7 +3,10 @@ package ru.iuturakulov.tartib.dsl
 /**
  * Class for defining validation rules
  */
-class ValidationRule<T> {
+class ValidationRule<T>(
+    private val validate: (T) -> Boolean,
+    val message: String
+) {
     private val rules = mutableListOf<Rule<T>>()
 
     /**
