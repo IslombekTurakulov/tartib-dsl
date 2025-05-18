@@ -36,20 +36,13 @@ jobs:
         run: ./gradlew --version
           
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build --info
         timeout-minutes: 10
         continue-on-error: false
         
       - name: Run tests with coverage
         run: ./gradlew test jacocoTestReport
         timeout-minutes: 5
-        
-      - name: Upload test coverage
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: build/reports/jacoco/test/html/
-          if-no-files-found: error
         
       - name: Publish to GitHub Packages
         if: success()
