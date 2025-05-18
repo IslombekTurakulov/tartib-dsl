@@ -1,6 +1,10 @@
 name: Publish Package
 
 on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
   release:
     types: [created]
 
@@ -22,8 +26,14 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'  # Встроенное кэширование Gradle
           
+      - name: Check Java version
+        run: java -version
+          
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
+          
+      - name: Check Gradle wrapper
+        run: ./gradlew --version
           
       - name: Build with Gradle
         run: ./gradlew build
