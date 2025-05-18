@@ -14,13 +14,30 @@ Tartib DSL is a powerful Kotlin library that provides a fluent and type-safe way
 
 ## Installation
 
-Add the following dependency to your `build.gradle.kts`:
+Add the following to your `build.gradle.kts`:
 
 ```kotlin
+repositories {
+    maven {
+        url = uri("https://maven.pkg.github.com/IslombekTurakulov/tartib-dsl")
+        credentials {
+            username = System.getenv("GITHUB_USERNAME")
+            password = System.getenv("GITHUB_TOKEN")
+        }
+    }
+}
+
 dependencies {
     implementation("ru.iuturakulov:tartib-dsl:0.1.0")
 }
 ```
+
+To use the library, you need to:
+1. Create a GitHub account if you don't have one
+2. Create a Personal Access Token (PAT) with `read:packages` scope
+3. Set the following environment variables:
+   - `GITHUB_USERNAME`: your GitHub username
+   - `GITHUB_TOKEN`: your Personal Access Token
 
 ## Quick Start
 
@@ -35,7 +52,7 @@ data class User(
 val isValid = user.isValid {
     validate {
         notBlank { it.username }
-        email { it.email }
+        isEmail { it.email }
         range(18, 100) { it.age }
     }
 }
@@ -44,7 +61,7 @@ val isValid = user.isValid {
 val results = user.validate {
     validate {
         notBlank { it.username }
-        email { it.email }
+        isEmail { it.email }
         range(18, 100) { it.age }
     }
 }
@@ -74,10 +91,10 @@ validate {
 ```kotlin
 validate {
     // Email validation
-    email { it.email }
+    isEmail { it.email }
     
     // Phone number validation
-    phone { it.phone }
+    isPhone { it.phone }
     
     // URL validation
     url { it.website }
@@ -99,6 +116,13 @@ validate {
     
     // Maximum value
     max(1000.0) { it.amount }
+    
+    // Additional numeric validations
+    positive { it.value }
+    negative { it.value }
+    even { it.value }
+    odd { it.value }
+    divisibleBy(2) { it.value }
 }
 ```
 
@@ -106,17 +130,49 @@ validate {
 
 ```kotlin
 validate {
-    // Date after
-    dateAfter(LocalDate.now()) { it.deliveryDate }
-    
     // Date before
-    dateBefore(LocalDate.now().plusDays(30)) { it.expiryDate }
+    dateBefore(LocalDate.now()) { it.deliveryDate }
+    
+    // Date after
+    dateAfter(LocalDate.now().plusDays(30)) { it.expiryDate }
     
     // Date range
     dateBetween(
         start = LocalDate.now(),
         end = LocalDate.now().plusDays(30)
     ) { it.validityPeriod }
+    
+    // DateTime validations
+    dateTimeBefore(LocalDateTime.now()) { it.createdAt }
+    dateTimeAfter(LocalDateTime.now()) { it.updatedAt }
+}
+```
+
+### Collection Validations
+
+```kotlin
+validate {
+    // List validations
+    listNotEmpty { it.items }
+    listSize(5) { it.items }
+    listMinSize(1) { it.items }
+    listMaxSize(10) { it.items }
+    
+    // Set validations
+    setNotEmpty { it.uniqueItems }
+    setSize(3) { it.uniqueItems }
+    
+    // Array validations
+    arrayNotEmpty { it.data }
+    arraySize(5) { it.data }
+    
+    // Map validations
+    mapNotEmpty { it.properties }
+    mapSize(3) { it.properties }
+    
+    // Sequence validations
+    sequenceNotEmpty { it.sequence }
+    sequenceSize(5) { it.sequence }
 }
 ```
 
@@ -134,7 +190,7 @@ validate {
         rule {
             name("Email format")
             condition { it.email.contains("@") }
-            message("Invalid email")
+            message("Invalid email format")
         }
     }
     
@@ -180,8 +236,10 @@ validate {
     }
     
     // Validate collection elements
-    notEmpty { it.items }
-    size(1, 10) { it.items }
+    forEach({ it.items }) {
+        required { it.productId }
+        min(1) { it.quantity }
+    }
 }
 ```
 
@@ -220,7 +278,7 @@ validate {
 val userValidationRules = validate<User> {
     validate {
         notBlank { it.username }
-        email { it.email }
+        isEmail { it.email }
         range(18, 100) { it.age }
     }
 }
@@ -235,14 +293,14 @@ val isValid = userValidationRules.withContext(user).isValid()
 val basicRules = validate<User> {
     validate {
         notBlank { it.username }
-        email { it.email }
+        isEmail { it.email }
     }
 }
 
 val advancedRules = validate<User> {
     validate {
         range(18, 100) { it.age }
-        phone { it.phone }
+        isPhone { it.phone }
     }
 }
 
